@@ -3,37 +3,47 @@
 <head>
   <meta charset="UTF-8" />
   <title>Your Receipt</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-       background-color: #C9B194; 
-      
+      background-color: #C9B194;
+      margin: 0;
     }
+
     .receipt {
-      width: 600px;
+      max-width: 600px;
+      width: 100%;
       margin: auto;
       border: 1px solid #ddd;
       padding: 20px;
       border-radius: 10px;
+      background-color: #fff;
+      box-sizing: border-box;
     }
+
     .receipt h2 {
       text-align: center;
+      margin-bottom: 1rem;
+      font-size: 1.6rem;
     }
+
     .item {
       display: flex;
       justify-content: space-between;
       margin-bottom: 10px;
     }
+
     .total {
       font-weight: bold;
       text-align: right;
       margin-top: 20px;
     }
+
     button {
       margin-top: 20px;
       padding: 10px 20px;
@@ -44,20 +54,52 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
+      font-size: 1rem;
     }
+
     button:hover {
       background-color: #45a049;
     }
-    @media (max-width: 600px) {
- .receipt {
-    width: 400px;
-    padding: 1.2rem;
-  }
-}
 
+
+    @media (max-width: 600px) {
+      .receipt {
+        width: 100%;
+        padding: 1.2rem;
+        border-radius: 8px;
+        box-sizing: border-box;
+      }
+
+      .receipt h2 {
+        font-size: 1.4rem;
+        text-align: center;
+        margin-bottom: 1rem;
+      }
+
+      .item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+        font-size: 0.95rem;
+      }
+
+      .total {
+        font-size: 1.1rem;
+        text-align: left;
+      }
+
+      button {
+        width: 100%;
+        margin: 10px 0;
+        font-size: 1rem;
+        padding: 0.9rem;
+        border-radius: 8px;
+      }
+    }
   </style>
 </head>
 <body>
+
   <div class="receipt" id="receipt">
     <h2>Order Receipt</h2>
     <div id="customer-info"></div>
@@ -83,10 +125,8 @@
         <p><strong>Name:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email || "N/A"}</p>
         <p><strong>Address:</strong> ${address}</p>
-        <p> Thank you, your order has been placed! Stir & enjoy!</p>
-        
+        <p>Thank you, your order has been placed! Stir & enjoy!</p>
       `;
-      
 
       const itemsHTML = cart.map(item => `
         <div class="item">
@@ -97,30 +137,29 @@
 
       document.getElementById("order-items").innerHTML = itemsHTML;
       document.getElementById("order-total").textContent = `Total: $${total.toFixed(2)}`;
-     
 
       localStorage.removeItem("cart");
       localStorage.removeItem("orderReceipt");
     });
 
-   async function downloadPDF() {
-  const jsPDF = window.jspdf.jsPDF; 
-  const doc = new jsPDF();
+    async function downloadPDF() {
+      const jsPDF = window.jspdf.jsPDF;
+      const doc = new jsPDF();
 
-  const receiptContent = document.getElementById("receipt");
+      const receiptContent = document.getElementById("receipt");
 
-  await doc.html(receiptContent, {
-    callback: function (doc) {
-      doc.save("receipt.pdf");
-    },
-    x: 10,
-    y: 10,
-    html2canvas: {
-      scale: 0.3
+      await doc.html(receiptContent, {
+        callback: function (doc) {
+          doc.save("receipt.pdf");
+        },
+        x: 10,
+        y: 10,
+        html2canvas: {
+          scale: 0.3
+        }
+      });
     }
-  });
-}
-
   </script>
+
 </body>
 </html>
