@@ -226,7 +226,8 @@ nav {
   }
 
   .yum,
-  .bean {
+  .bean, 
+  .picture{
     display: none;
   }
 
