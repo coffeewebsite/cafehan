@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Your Receipt</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+       background-color: #C9B194; 
+      
+    }
+    .receipt {
+      width: 600px;
+      margin: auto;
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    .receipt h2 {
+      text-align: center;
+    }
+    .item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .total {
+      font-weight: bold;
+      text-align: right;
+      margin-top: 20px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      display: inline-block;
+      margin-right: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    @media (max-width: 600px) {
+ .receipt {
+    width: 400px;
+    padding: 1.2rem;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <div class="receipt" id="receipt">
+    <h2>Order Receipt</h2>
+    <div id="customer-info"></div>
+    <hr />
+    <div id="order-items"></div>
+    <div class="total" id="order-total"></div>
+    <button onclick="downloadPDF()">Download Receipt</button>
+    <button onclick="window.print()">Print Receipt</button>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const receiptData = JSON.parse(localStorage.getItem("orderReceipt"));
+
+      if (!receiptData) {
+        document.getElementById("receipt").innerHTML = "<p>No receipt data found.</p>";
+        return;
+      }
+
+      const { name, email, address, cart, total, message } = receiptData;
+
+      document.getElementById("customer-info").innerHTML = `
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email || "N/A"}</p>
+        <p><strong>Address:</strong> ${address}</p>
+        <p> Thank you, your order has been placed! Stir & enjoy!</p>
+        
+      `;
+      
+
+      const itemsHTML = cart.map(item => `
+        <div class="item">
+          <span>${item.name} x${item.quantity}</span>
+          <span>$${(item.price * item.quantity).toFixed(2)}</span>
+        </div>
+      `).join("");
+
+      document.getElementById("order-items").innerHTML = itemsHTML;
+      document.getElementById("order-total").textContent = `Total: $${total.toFixed(2)}`;
+     
+
+      localStorage.removeItem("cart");
+      localStorage.removeItem("orderReceipt");
+    });
+
+   async function downloadPDF() {
+  const jsPDF = window.jspdf.jsPDF; 
+  const doc = new jsPDF();
+
+  const receiptContent = document.getElementById("receipt");
+
+  await doc.html(receiptContent, {
+    callback: function (doc) {
+      doc.save("receipt.pdf");
+    },
+    x: 10,
+    y: 10,
+    html2canvas: {
+      scale: 0.3
+    }
+  });
+}
+
+  </script>
+</body>
+</html>
